@@ -5,6 +5,7 @@ import { Calendar, BedDouble, UtensilsCrossed, CheckCircle2 } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Footer from "@/components/Footer";
+import { useTripStore } from "@/store/useTripStore";
 interface TripDay {
   day: number;
   location: string;
@@ -27,18 +28,34 @@ interface TripResult {
 const TripResultPage = () => {
   const navigate = useNavigate();
   const [trip, setTrip] = useState<TripResult | null>(null);
+  const selectedTrip = useTripStore((state) => state.selectedTrip);
+
   useEffect(() => {
+    // Priority 1: Store
+    if (selectedTrip && (selectedTrip as any).days) {
+      setTrip(selectedTrip as any);
+      return;
+    }
+
+    // Priority 2: Session Storage
     const raw = sessionStorage.getItem("trip_result");
     if (!raw) {
       navigate("/planner");
       return;
     }
     try {
-      setTrip(JSON.parse(raw));
+      const parsed = JSON.parse(raw);
+      // Backend might return the trip object directly or nested under 'trip'
+      const tripData = parsed.trip ?? parsed;
+      if (tripData && tripData.days) {
+        setTrip(tripData);
+      } else {
+        navigate("/planner");
+      }
     } catch {
       navigate("/planner");
     }
-  }, [navigate]);
+  }, [navigate, selectedTrip]);
   const handlePlanAnother = () => {
     sessionStorage.removeItem("trip_result");
     sessionStorage.removeItem("trip_session_id");

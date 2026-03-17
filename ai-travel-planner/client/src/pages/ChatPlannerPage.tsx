@@ -220,6 +220,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import Footer from "@/components/Footer";
+import { useTripStore } from "@/store/useTripStore";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
@@ -244,6 +245,7 @@ const TypingDots = () => (
 
 const ChatPlannerPage = () => {
   const navigate = useNavigate();
+  const setSelectedTrip = useTripStore((state) => (state as any).setSelectedTrip || state.selectTrip);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -298,9 +300,16 @@ const ChatPlannerPage = () => {
           { role: "ai", content: q.text, options: q.options },
         ]);
       } else if (data.type === "complete") {
-        sessionStorage.setItem("trip_result", JSON.stringify(data.trip));
+        const tripData = data.trip ?? data;
+        sessionStorage.setItem("trip_result", JSON.stringify(tripData));
+        
+        // Also sync to store if the method exists
+        if (setSelectedTrip) {
+          setSelectedTrip(tripData);
+        }
+
         // Brief pause so user sees completion
-        setTimeout(() => navigate("/trip/result"), 800);
+        setTimeout(() => navigate("/trip-result"), 800);
       }
     } catch (err) {
       setMessages((prev) => [

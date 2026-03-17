@@ -27,6 +27,10 @@ export const useTripStore = create<TripStore>((set, get) => ({
     set({ selectedTrip: trip });
   },
 
+  setSelectedTrip: (trip: any) => {
+    set({ selectedTrip: trip });
+  },
+
   toggleWildcard: (tripId: string, wildcardId: string) => {
     const { trips } = get();
     const updated = trips.map((trip) => {
