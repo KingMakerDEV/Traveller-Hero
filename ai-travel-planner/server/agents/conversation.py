@@ -112,7 +112,7 @@ def run_conversation_agent(state: PlannerState) -> PlannerState:
 
     try:
         response = client.chat.completions.create(
-            model="google/gemma-2-27b-it",
+            model="meta/llama-3.3-70b-instruct",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_message}

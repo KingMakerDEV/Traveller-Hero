@@ -9,7 +9,7 @@
 // import PlannerPage from "@/pages/PlannerPage";
 // import TripDetailPage from "@/pages/TripDetailPage";
 // import LoadingPage from "@/pages/LoadingPage";
-// import AboutPage from "@/pages/AboutPage";
+// import ChatPlannerPage from "@/pages/ChatPlannerPage";
 // import NotFound from "@/pages/NotFound";
 
 // const queryClient = new QueryClient();
@@ -24,7 +24,7 @@
 //         <Route path="/planner" element={<PlannerPage />} />
 //         <Route path="/trip/:tripId" element={<TripDetailPage />} />
 //         <Route path="/loading" element={<LoadingPage />} />
-//         <Route path="/about" element={<AboutPage />} />
+//         <Route path="/chat" element={<ChatPlannerPage />} />
 //         <Route path="*" element={<NotFound />} />
 //       </Routes>
 //     </AnimatePresence>
@@ -48,7 +48,6 @@
 
 
 
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
@@ -61,6 +60,9 @@ import PlannerPage from "@/pages/PlannerPage";
 import TripDetailPage from "@/pages/TripDetailPage";
 import LoadingPage from "@/pages/LoadingPage";
 import ChatPlannerPage from "@/pages/ChatPlannerPage";
+import TripResultPage from "@/pages/TripResultPage";
+import AboutPage from "@/pages/AboutPage";
+
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +78,8 @@ const AnimatedRoutes = () => {
         <Route path="/trip/:tripId" element={<TripDetailPage />} />
         <Route path="/loading" element={<LoadingPage />} />
         <Route path="/chat" element={<ChatPlannerPage />} />
+        <Route path="/trip-result" element={<TripResultPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

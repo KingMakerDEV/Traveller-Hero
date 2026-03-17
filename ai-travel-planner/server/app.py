@@ -22,6 +22,7 @@ from langchain_core.messages import HumanMessage
 from graph.state import TripState
 from graph.workflow import build_graph
 from routes.feedback import feedback_bp
+from routes.planner import planner_bp
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -41,6 +42,8 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Register Blueprints
 app.register_blueprint(feedback_bp)
+app.register_blueprint(planner_bp)
+
 
 # Compile the LangGraph workflow once globally
 try:
