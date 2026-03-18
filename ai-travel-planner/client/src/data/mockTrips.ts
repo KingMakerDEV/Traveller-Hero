@@ -1,4 +1,10 @@
 import type { TripState } from "@/types/trip";
+import shinjuku from "@/assets/shinjuku.jpg";
+import snow_climbing from "@/assets/snow_climbing.jpg";
+import heritage from "@/assets/heritage.jpg";
+import mountain_hiking from "@/assets/mountain_hiking.jpg";
+import heritage2 from "@/assets/heritage2.jpg";
+import mountain_biking from "@/assets/mountain_biking.jpg";
 
 export const mockTrips: TripState[] = [
   {
@@ -6,25 +12,25 @@ export const mockTrips: TripState[] = [
     title: "Japan Discovery",
     country: "Japan",
     description: "Journey through ancient temples, neon-lit cities, and serene gardens. From Osaka's street food scene to Kyoto's zen monasteries and Tokyo's electrifying energy — experience the soul of Japan across 12 unforgettable days.",
-    heroImage: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1920&q=80",
+    heroImage: shinjuku,
     cities: [
       {
         name: "Osaka",
         days: 3,
         highlights: ["Dotonbori", "Osaka Castle", "Street Food Tour"],
-        images: ["https://images.unsplash.com/photo-1590559899731-a382839e5549?w=800&q=80"],
+        images: [shinjuku],
       },
       {
         name: "Kyoto",
         days: 4,
         highlights: ["Fushimi Inari", "Bamboo Grove", "Tea Ceremony"],
-        images: ["https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&q=80"],
+        images: [heritage2],
       },
       {
         name: "Tokyo",
         days: 5,
         highlights: ["Shibuya Crossing", "Tsukiji Market", "Akihabara"],
-        images: ["https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80"],
+        images: [shinjuku],
       },
     ],
     itinerary: [
@@ -44,6 +50,9 @@ export const mockTrips: TripState[] = [
     priceEstimate: 3200,
     duration: "12 Days",
     included: ["Professional Guide", "Domestic Flights", "All Transfers", "4-Star Hotels", "Daily Breakfast", "Cultural Experiences"],
+    intent: "Discovery",
+    intent_group: "High-Energy & Stimulation",
+    preferences: ["Culture", "Food", "History"],
     wildcards: [
       { id: "w1", title: "Sumo Tournament", description: "Attend a live sumo wrestling match in Tokyo" },
       { id: "w2", title: "Mount Fuji Climb", description: "Optional overnight climb to the summit of Mt. Fuji" },
@@ -54,25 +63,25 @@ export const mockTrips: TripState[] = [
     title: "Iceland Aurora Trail",
     country: "Iceland",
     description: "Chase the Northern Lights across volcanic landscapes, glacial lagoons, and geothermal hot springs. Iceland's raw, untamed beauty awaits in this 8-day expedition through fire and ice.",
-    heroImage: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?w=1920&q=80",
+    heroImage: snow_climbing,
     cities: [
       {
         name: "Reykjavik",
         days: 2,
         highlights: ["Hallgrímskirkja", "Blue Lagoon", "Northern Lights Tour"],
-        images: ["https://images.unsplash.com/photo-1529963183134-61a90db47eaf?w=800&q=80"],
+        images: [snow_climbing],
       },
       {
         name: "Vik",
         days: 3,
         highlights: ["Black Sand Beach", "Seljalandsfoss", "Ice Cave"],
-        images: ["https://images.unsplash.com/photo-1476610182048-b716b8515aaa?w=800&q=80"],
+        images: [mountain_hiking],
       },
       {
         name: "Akureyri",
         days: 3,
         highlights: ["Godafoss", "Whale Watching", "Myvatn"],
-        images: ["https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=800&q=80"],
+        images: [snow_climbing],
       },
     ],
     itinerary: [
@@ -88,6 +97,9 @@ export const mockTrips: TripState[] = [
     priceEstimate: 4500,
     duration: "8 Days",
     included: ["Expert Guide", "4x4 Vehicle", "All Transfers", "Boutique Hotels", "Daily Meals", "Gear Rental"],
+    intent: "Peace & Serenity",
+    intent_group: "Restoration & Wellness",
+    preferences: ["Nature", "Photography", "Relaxation"],
     wildcards: [
       { id: "w1", title: "Snorkeling Silfra", description: "Snorkel between tectonic plates in crystal-clear glacial water" },
       { id: "w2", title: "Helicopter Tour", description: "Aerial tour over active volcanoes and glaciers" },
@@ -98,25 +110,25 @@ export const mockTrips: TripState[] = [
     title: "Peru Sacred Valley",
     country: "Peru",
     description: "Walk in the footsteps of the Incas through the Sacred Valley to Machu Picchu. From Lima's culinary scene to Cusco's colonial charm and the ancient citadel in the clouds — a journey of altitude and attitude.",
-    heroImage: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1920&q=80",
+    heroImage: heritage,
     cities: [
       {
         name: "Lima",
         days: 2,
         highlights: ["Miraflores", "Ceviche Tasting", "Huaca Pucllana"],
-        images: ["https://images.unsplash.com/photo-1531968455001-5c5272a67c71?w=800&q=80"],
+        images: [shinjuku],
       },
       {
         name: "Cusco",
         days: 3,
         highlights: ["Plaza de Armas", "San Pedro Market", "Sacsayhuamán"],
-        images: ["https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80"],
+        images: [heritage],
       },
       {
         name: "Machu Picchu",
         days: 3,
         highlights: ["Sun Gate", "Huayna Picchu", "Inca Trail"],
-        images: ["https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=800&q=80"],
+        images: [heritage2],
       },
     ],
     itinerary: [
@@ -132,6 +144,9 @@ export const mockTrips: TripState[] = [
     priceEstimate: 2800,
     duration: "8 Days",
     included: ["Expert Guide", "Domestic Flights", "Train Tickets", "3-Star Hotels", "Daily Breakfast", "Entrance Fees"],
+    intent: "Adventure",
+    intent_group: "High-Energy & Stimulation",
+    preferences: ["Hiking", "Inca Culture", "Mountains"],
     wildcards: [
       { id: "w1", title: "Rainbow Mountain", description: "Hike to the stunning Vinicunca Rainbow Mountain at 5,200m" },
     ],
@@ -141,25 +156,25 @@ export const mockTrips: TripState[] = [
     title: "Norway Fjord Explorer",
     country: "Norway",
     description: "Cruise through dramatic fjords, hike to iconic cliff edges, and witness the midnight sun. Norway's western coast is a masterpiece of nature carved by glaciers over millennia.",
-    heroImage: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80",
+    heroImage: mountain_hiking,
     cities: [
       {
         name: "Bergen",
         days: 2,
         highlights: ["Bryggen Wharf", "Fløibanen", "Fish Market"],
-        images: ["https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?w=800&q=80"],
+        images: [mountain_hiking],
       },
       {
         name: "Flåm",
         days: 3,
         highlights: ["Flåm Railway", "Sognefjord Cruise", "Stegastein Viewpoint"],
-        images: ["https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=800&q=80"],
+        images: [mountain_biking],
       },
       {
         name: "Stavanger",
         days: 3,
         highlights: ["Pulpit Rock", "Lysefjord", "Old Stavanger"],
-        images: ["https://images.unsplash.com/photo-1520769669658-f07657f5a307?w=800&q=80"],
+        images: [mountain_hiking],
       },
     ],
     itinerary: [
@@ -175,6 +190,9 @@ export const mockTrips: TripState[] = [
     priceEstimate: 3800,
     duration: "8 Days",
     included: ["Local Guide", "Fjord Cruises", "All Transfers", "Boutique Lodges", "Daily Breakfast", "Hiking Gear"],
+    intent: "Wanderlust",
+    intent_group: "Tactical & Pragmatic",
+    preferences: ["Fjords", "Cruises", "Waterfalls"],
     wildcards: [
       { id: "w1", title: "Trolltunga Hike", description: "Epic 10-hour hike to the famous Troll's Tongue rock formation" },
       { id: "w2", title: "Northern Lights Flight", description: "Charter flight to chase the aurora borealis" },

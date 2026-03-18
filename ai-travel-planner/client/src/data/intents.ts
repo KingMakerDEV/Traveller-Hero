@@ -1,3 +1,16 @@
+import skydiving from "@/assets/skydiving.jpg";
+import rainforest from "@/assets/rainforest.jpg";
+import shinjuku from "@/assets/shinjuku.jpg";
+import island from "@/assets/island.jpg";
+import temples_in_forest from "@/assets/temples_in_forest.jpg";
+import beach from "@/assets/beach.jpg";
+import raft from "@/assets/raft.jpg";
+import surfing from "@/assets/surfing.jpg";
+import heritage2 from "@/assets/heritage2.jpg";
+import diving from "@/assets/diving.jpg";
+import rock_climbing from "@/assets/rock_climbing.jpg";
+import mountain_biking from "@/assets/mountain_biking.jpg";
+
 export interface Intent {
   id: string;
   title: string;
@@ -22,21 +35,21 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "Adrenaline",
         description: "High-intensity activities, physical challenges, and extreme sports.",
         group: "Group A",
-        image: "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: skydiving,
       },
       {
         id: "discovery",
         title: "Discovery",
         description: "Focus on novelty, 'hidden gems', and off-the-beaten-path locations.",
         group: "Group A",
-        image: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: rainforest,
       },
       {
         id: "social-pulse",
         title: "Social Pulse",
         description: "High-energy nightlife, festivals, crowded markets, and urban exploration.",
         group: "Group A",
-        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: shinjuku,
       },
     ],
   },
@@ -49,21 +62,21 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "Peace & Serenity",
         description: "Quiet, nature-focused retreats, minimal transit, and low-crowd density.",
         group: "Group B",
-        image: "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: island,
       },
       {
         id: "digital-detox",
         title: "Digital Detox",
         description: "'Off-the-grid' locations with a focus on mindfulness and disconnecting.",
         group: "Group B",
-        image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: temples_in_forest,
       },
       {
         id: "rejuvenation",
         title: "Rejuvenation",
         description: "Focused on self-care, luxury resorts, and slow-paced sensory experiences.",
         group: "Group B",
-        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: beach,
       },
     ],
   },
@@ -76,21 +89,21 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "Family Bonding",
         description: "Multi-generational friendly activities, safety-first logistics, and shared memories.",
         group: "Group C",
-        image: "https://images.unsplash.com/photo-1602070183145-21c607f2a176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: raft,
       },
       {
         id: "romantic-escape",
         title: "Romantic Escape",
         description: "Intimate settings, aesthetic landscapes, and curated dining experiences.",
         group: "Group C",
-        image: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: surfing,
       },
       {
         id: "heritage-roots",
         title: "Heritage & Roots",
         description: "Exploring ancestral history, cultural museums, and local traditions.",
         group: "Group C",
-        image: "https://images.unsplash.com/photo-1518998053401-a414f08e484a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: heritage2,
       },
     ],
   },
@@ -103,21 +116,21 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "The Quick Break",
         description: "Optimized for maximum experience in a 48–72 hour window.",
         group: "Group D",
-        image: "https://images.unsplash.com/photo-1536648719266-9bc0abed4392?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: diving,
       },
       {
         id: "wanderlust",
         title: "Wanderlust",
         description: "Minimal pre-planning, flexible routes, and open-ended itineraries.",
         group: "Group D",
-        image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: rock_climbing,
       },
       {
         id: "road-trip",
         title: "Road Trip",
         description: "Focus on the transit experience, scenic lookouts, and geographic breadth.",
         group: "Group D",
-        image: "https://images.unsplash.com/photo-1463123081488-789f998ac9c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: mountain_biking,
       },
     ],
   },

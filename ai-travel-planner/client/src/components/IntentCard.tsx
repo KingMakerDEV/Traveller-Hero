@@ -34,7 +34,7 @@ const IntentCard = ({ title, description, image, group, index, onSelect }: Inten
         <img
           src={image}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
           onError={(e) => {
              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(title)}/400/600`;

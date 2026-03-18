@@ -7,6 +7,11 @@ import Footer from "@/components/Footer";
 import { useTripStore } from "@/store/useTripStore";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
+import mountain_hiking from "@/assets/mountain_hiking.jpg";
+import snow_climbing from "@/assets/snow_climbing.jpg";
+import travel_16 from "@/assets/travel_16.jpg";
+import heritage from "@/assets/heritage.jpg";
+
 const features = [
   { icon: Shield, title: "Trusted Agency", desc: "15+ years of crafting unforgettable journeys worldwide." },
   { icon: HeadphonesIcon, title: "24/7 Support", desc: "Our travel experts are always a message away." },
@@ -14,10 +19,10 @@ const features = [
 ];
 
 const wonderImages = [
-  { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80", label: "Norwegian Fjords" },
-  { src: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=600&q=80", label: "Mount Fuji" },
-  { src: "https://images.unsplash.com/photo-1504829857797-ddff29c27927?w=600&q=80", label: "Northern Lights" },
-  { src: "https://images.unsplash.com/photo-1526392060635-9d6019884377?w=600&q=80", label: "Machu Picchu" },
+  { src: mountain_hiking, label: "Norwegian Fjords" },
+  { src: snow_climbing, label: "Mount Fuji" },
+  { src: travel_16, label: "Northern Lights" },
+  { src: heritage, label: "Machu Picchu" },
 ];
 
 const HomePage = () => {
@@ -89,7 +94,7 @@ const HomePage = () => {
               <img
                 src={img.src}
                 alt={img.label}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
