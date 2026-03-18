@@ -40,9 +40,11 @@ app = Flask(__name__)
 # Enable Universal CORS — supports_credentials must NOT be used with wildcard origin
 # CORS(app, resources={r"/*": {"origins": "*"}})
 CORS(app, resources={r"/*": {"origins": [
-    "https://travellerhero.vercel.app",
+    "https://traveller-hero.vercel.app",
     "http://localhost:8080",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8080"
 ]}})
 # Register Blueprints
 app.register_blueprint(feedback_bp)
