@@ -4,6 +4,7 @@ export interface Intent {
   description: string;
   group: string;
   image: string;
+  keyword: string;
 }
 
 export interface IntentGroup {
@@ -22,21 +23,24 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "Adrenaline",
         description: "High-intensity activities, physical challenges, and extreme sports.",
         group: "Group A",
-        image: "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1521033332975-77aff1c5c1c1?w=800&q=80",
+        keyword: "extreme sports adventure adrenaline"
       },
       {
         id: "discovery",
         title: "Discovery",
         description: "Focus on novelty, 'hidden gems', and off-the-beaten-path locations.",
         group: "Group A",
-        image: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+        keyword: "hiking hidden gems adventure discovery"
       },
       {
         id: "social-pulse",
         title: "Social Pulse",
         description: "High-energy nightlife, festivals, crowded markets, and urban exploration.",
         group: "Group A",
-        image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1514525253348-8d955c327424?w=800&q=80",
+        keyword: "nightlife party city lights social pulse"
       },
     ],
   },
@@ -49,21 +53,24 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "Peace & Serenity",
         description: "Quiet, nature-focused retreats, minimal transit, and low-crowd density.",
         group: "Group B",
-        image: "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80",
+        keyword: "peaceful landscape lake mountains serenity"
       },
       {
         id: "digital-detox",
         title: "Digital Detox",
         description: "'Off-the-grid' locations with a focus on mindfulness and disconnecting.",
         group: "Group B",
-        image: "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80",
+        keyword: "meditation cabin in woods digital detox"
       },
       {
         id: "rejuvenation",
         title: "Rejuvenation",
         description: "Focused on self-care, luxury resorts, and slow-paced sensory experiences.",
         group: "Group B",
-        image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1544161515-4af6b1d46152?w=800&q=80",
+        keyword: "spa wellness luxury resort rejuvenation"
       },
     ],
   },
@@ -76,21 +83,24 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "Family Bonding",
         description: "Multi-generational friendly activities, safety-first logistics, and shared memories.",
         group: "Group C",
-        image: "https://images.unsplash.com/photo-1602070183145-21c607f2a176?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80",
+        keyword: "family hiking picnic bonding"
       },
       {
         id: "romantic-escape",
         title: "Romantic Escape",
         description: "Intimate settings, aesthetic landscapes, and curated dining experiences.",
         group: "Group C",
-        image: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=800&q=80",
+        keyword: "romantic sunset dinner beach honeymoon"
       },
       {
         id: "heritage-roots",
         title: "Heritage & Roots",
         description: "Exploring ancestral history, cultural museums, and local traditions.",
         group: "Group C",
-        image: "https://images.unsplash.com/photo-1518998053401-a414f08e484a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1523733566440-2ddb73d2ee39?w=800&q=80",
+        keyword: "historic building museum culture heritage"
       },
     ],
   },
@@ -103,21 +113,24 @@ export const INTENT_GROUPS: IntentGroup[] = [
         title: "The Quick Break",
         description: "Optimized for maximum experience in a 48–72 hour window.",
         group: "Group D",
-        image: "https://images.unsplash.com/photo-1536648719266-9bc0abed4392?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1503220317375-aaad61436b1b?w=800&q=80",
+        keyword: "city break weekend trip quick break"
       },
       {
         id: "wanderlust",
         title: "Wanderlust",
         description: "Minimal pre-planning, flexible routes, and open-ended itineraries.",
         group: "Group D",
-        image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80",
+        keyword: "adventure backpacker world travel wanderlust"
       },
       {
         id: "road-trip",
         title: "Road Trip",
         description: "Focus on the transit experience, scenic lookouts, and geographic breadth.",
         group: "Group D",
-        image: "https://images.unsplash.com/photo-1463123081488-789f998ac9c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80",
+        keyword: "road trip california desert highway"
       },
     ],
   },

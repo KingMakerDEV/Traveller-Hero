@@ -35,6 +35,8 @@ Rules:
 - Each day must have a distinct theme that builds on the previous day.
 - Activities must be specific — name actual places, trails, restaurants, experiences.
 - The plan must feel human and curated, not like a generic travel blog.
+- All prices and budgets must be in Indian Rupees using the ₹ symbol.
+- Estimated budget should reflect realistic costs for Indian travellers including flights from major Indian cities.
 - Always respond in valid JSON only. No markdown, no explanation, no extra text.
 
 Response format:
@@ -65,7 +67,7 @@ Response format:
     "Tip 3",
     "Tip 4"
   ],
-  "estimated_budget": "USD 1200 - 1800 per person excluding flights"
+  "estimated_budget": "₹85,000 - ₹1,20,000 per person including flights from Delhi"
 }
 """
 

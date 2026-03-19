@@ -1,4 +1,9 @@
+"""
+app.py — Main Flask Application Entry Point
 
+Exposes the LangGraph multi-agent workflow via a REST API.
+Handles CORS so the React client can communicate with it.
+"""
 
 import concurrent.futures
 import logging
@@ -23,33 +28,53 @@ from graph.state import TripState
 from graph.workflow import build_graph
 from routes.feedback import feedback_bp
 from routes.planner import planner_bp
+from routes.auth import auth_bp
+from routes.trips import trips_bp
+from routes.reviews import reviews_bp
+from routes.edit import edit_bp
 
 # Setup basic logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 print("--- ENVIRONMENT VERIFICATION ---")
 print("ENV SMTP_USER =", os.getenv("SMTP_USER"))
 print("ENV SMTP_PASS =", os.getenv("SMTP_PASS")[:10] + "..." if os.getenv("SMTP_PASS") else None)
 print("ENV SMTP_SENDER_EMAIL =", os.getenv("SMTP_SENDER_EMAIL"))
+print("ENV NVIDIA_API_KEY =", "set" if os.getenv("NVIDIA_API_KEY") else "NOT SET")
+print("ENV SUPABASE_URL =", os.getenv("SUPABASE_URL"))
+print("ENV SUPABASE_KEY =", "set" if os.getenv("SUPABASE_SERVICE_ROLE_KEY") else "NOT SET")
 print("--------------------------------")
 
 # Initialize Flask
 app = Flask(__name__)
 
-# Enable Universal CORS — supports_credentials must NOT be used with wildcard origin
-# CORS(app, resources={r"/*": {"origins": "*"}})
-CORS(app, resources={r"/*": {"origins": [
-    "https://traveller-hero.vercel.app",
-    "http://localhost:8080",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://127.0.0.1:8080"
-]}})
-# Register Blueprints
+# Enable CORS for all routes
+CORS(app,
+    resources={r"/*": {
+        "origins": [
+            "https://traveller-hero.vercel.app",
+            "http://localhost:8080",
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:8080"
+        ],
+        "methods": ["GET", "POST", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "max_age": 3600
+    }}
+)
+
+# Register all Blueprints
 app.register_blueprint(feedback_bp)
 app.register_blueprint(planner_bp)
-
+app.register_blueprint(auth_bp)
+app.register_blueprint(trips_bp)
+app.register_blueprint(reviews_bp)
+app.register_blueprint(edit_bp)
 
 # Compile the LangGraph workflow once globally
 try:
@@ -59,6 +84,7 @@ try:
 except Exception as e:
     logger.error("Failed to compile LangGraph workflow: %s", e)
     master_graph = None
+
 
 @app.before_request
 def log_all_requests():
@@ -71,7 +97,8 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "graph_loaded": master_graph is not None,
-        "openai_key_set": bool(os.getenv("NVIDIA_API_KEY"))
+        "nvidia_key_set": bool(os.getenv("NVIDIA_API_KEY")),
+        "supabase_connected": bool(os.getenv("SUPABASE_URL"))
     }), 200
 
 
@@ -91,7 +118,6 @@ def plan_trip_new():
     if not intent or not intent_group:
         return jsonify({"error": "Missing intent or intent_group"}), 400
 
-    # Verify intent belongs to intent_group
     VALID_GROUPS = {
         "High-Energy & Stimulation": ["Adrenaline", "Discovery", "Social Pulse"],
         "Restoration & Wellness": ["Peace & Serenity", "Digital Detox", "Rejuvenation"],
@@ -119,7 +145,6 @@ def plan_trip_new():
     if os.environ.get("PLANNER_MODE") == "mock":
         return jsonify(dummy_response), 200
 
-    # Build the initial TripState (matching strict contract)
     initial_state = {
         "messages": [HumanMessage(content=f"Please plan a trip based on this intent: {intent}")],
         "itinerary": {"destination": "To Be Decided", "start_date": "", "end_date": "", "days": []},
@@ -139,12 +164,11 @@ def plan_trip_new():
     try:
         logger.info(f"Starting trip generation for intent {intent}...")
 
-        # 10s Timeout Wrapper
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             future = executor.submit(run_graph)
             final_state = future.result(timeout=10.0)
 
-        logger.info(f"Trip generation completed successfully.")
+        logger.info("Trip generation completed successfully.")
 
         serializable_state = {
             "intent": final_state.get("intent", intent),
@@ -159,7 +183,7 @@ def plan_trip_new():
         return jsonify(serializable_state), 200
 
     except concurrent.futures.TimeoutError:
-        logger.warning(f"Timeout of 10s reached. Falling back to mock data.")
+        logger.warning("Timeout of 10s reached. Falling back to mock data.")
         return jsonify(dummy_response), 200
     except Exception as e:
         logger.error(f"Error during graph invocation: {traceback.format_exc()}")
@@ -169,6 +193,5 @@ def plan_trip_new():
 
 
 if __name__ == "__main__":
-    # Run the development server
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)

@@ -2,10 +2,13 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useUnsplashImages } from "@/hooks/useUnsplashImages";
 
 const Hero = () => {
   const ref = useRef<HTMLDivElement>(null);
   const prefersReduced = useReducedMotion();
+  const { images } = useUnsplashImages("aerial view travel world adventure", 1);
+  
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -16,15 +19,15 @@ const Hero = () => {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
 
   return (
-    <section ref={ref} className="relative h-screen overflow-hidden">
+    <section ref={ref} className="relative h-screen overflow-hidden bg-stone-800">
       {/* Parallax Background */}
       <motion.div
         style={prefersReduced ? {} : { y, scale }}
         className="absolute inset-0"
       >
         <img
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80"
-          alt="Mountain landscape with dramatic clouds"
+          src={images[0] || "https://images.unsplash.com/photo-1488085061387-422e29b40080?w=1920&q=80"}
+          alt="Adventure travel background"
           className="h-full w-full object-cover"
           loading="eager"
         />

@@ -145,10 +145,30 @@ def submit_answer():
             trip = result_state["trip_plan"]
             session_store.delete_session(session_id)
             print(f"Session {session_id}: Trip plan complete — {trip['title']}")
+
+    # Generate image keywords for this trip
+            try:
+                from agents.image_agent import run_image_agent
+                image_keywords = run_image_agent(trip)
+                print(f"Session {session_id}: Image keywords generated.")
+            except Exception as img_err:
+                logger.error("Image agent failed: %s", img_err)
+                image_keywords = {}
+
             return jsonify({
                 "type": "complete",
-                "trip": trip
+                "trip": trip,
+                "image_keywords": image_keywords
             }), 200
+
+        # if result_state.get("trip_plan") is not None:
+        #     trip = result_state["trip_plan"]
+        #     session_store.delete_session(session_id)
+        #     print(f"Session {session_id}: Trip plan complete — {trip['title']}")
+        #     return jsonify({
+        #         "type": "complete",
+        #         "trip": trip
+        #     }), 200
 
         # Otherwise return the next question
         if not result_state["questions_asked"]:

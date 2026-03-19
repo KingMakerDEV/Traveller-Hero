@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useUnsplashImages } from "@/hooks/useUnsplashImages";
 
 interface IntentCardProps {
   title: string;
@@ -8,10 +9,13 @@ interface IntentCardProps {
   group: string;
   index: number;
   onSelect: () => void;
+  imageKeyword?: string;
 }
 
-const IntentCard = ({ title, description, image, group, index, onSelect }: IntentCardProps) => {
+const IntentCard = ({ title, description, image, group, index, onSelect, imageKeyword }: IntentCardProps) => {
   const prefersReduced = useReducedMotion();
+  const { images } = useUnsplashImages(imageKeyword || "", 1);
+  const finalImage = (imageKeyword && images[0]) ? images[0] : image;
 
   return (
     <motion.article
@@ -22,7 +26,7 @@ const IntentCard = ({ title, description, image, group, index, onSelect }: Inten
       whileHover={prefersReduced ? {} : { y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onSelect}
-      className="group cursor-pointer overflow-hidden rounded-lg glass"
+      className="group cursor-pointer overflow-hidden rounded-lg glass bg-stone-800"
       role="button"
       tabIndex={0}
       aria-label={`Select intent: ${title}`}
@@ -32,9 +36,9 @@ const IntentCard = ({ title, description, image, group, index, onSelect }: Inten
     >
       <div className="relative aspect-[3/4] overflow-hidden">
         <img
-          src={image}
+          src={finalImage}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
           onError={(e) => {
              (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(title)}/400/600`;

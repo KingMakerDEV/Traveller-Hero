@@ -2,6 +2,18 @@ import { useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import Footer from "@/components/Footer";
+import { useUnsplashImages } from "@/hooks/useUnsplashImages";
+
+const SectionImage = ({ keyword, fallback }: { keyword: string; fallback: string }) => {
+  const { images } = useUnsplashImages(keyword, 1);
+  return (
+    <img 
+      src={images[0] || fallback} 
+      alt="Thematic illustration" 
+      className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-105 opacity-70 group-hover:opacity-100"
+    />
+  );
+};
 
 const AboutPage = () => {
   const { scrollYProgress } = useScroll();
@@ -60,22 +72,32 @@ const AboutPage = () => {
     {
       title: "The Project",
       content: "TravellerHero is an AI-powered adventure travel planner designed to bridge the gap between human curiosity and machine intelligence. We move away from generic travel lists and focus on psychological intent—how you want to feel, not just where you want to go.",
+      keyword: "travel planning technology AI future",
+      fallback: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80"
     },
     {
       title: "Multi-Agent System",
       content: "Our architecture utilizes a specialized team of 6 AI agents, each with a distinct role: Scout (research), Concierge (logistics), Architect (itinerary structuring), Instigator (wildcards), and Curator (validation). This collaborative intelligence ensures every trip is balanced and unique.",
+      keyword: "collaboration futuristic robots teamwork nature",
+      fallback: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80"
     },
     {
       title: "LangGraph Workflow",
       content: "The system is orchestrated by LangGraph, allowing for cyclic state management. Agents don't just run once; they converse and refine the plan iteratively until the Supervisor marks the execution as complete.",
+      keyword: "network connection nodes landscape abstract",
+      fallback: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80"
     },
     {
       title: "Intent-Based Planning",
       content: "We categorize travel into psychological pillars: Restoration, Stimulation, Connection, and Pragmatism. By selecting an intent like 'Adrenaline' or 'Digital Detox', the agents prioritize experiences that fulfill your current mental state.",
+      keyword: "psychology meditation adventure nature peace",
+      fallback: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80"
     },
     {
       title: "Free-Tier Architecture",
       content: "Engineered for accessibility, TravellerHero runs on a high-performance free-tier stack: React + Vite on Vercel for the frontend, and a Python Flask backend on Render/Railway. We leverage Nvidia NIM for lightning-fast LLM inference without infrastructure costs.",
+      keyword: "modern minimalist clean software tech",
+      fallback: "https://images.unsplash.com/photo-1498050109023-c514c33d865c?w=800&q=80"
     }
   ];
 
@@ -114,9 +136,11 @@ const AboutPage = () => {
                 {section.content}
               </p>
             </div>
-            <div className="flex-1 w-full aspect-video bg-[#0D2623] border border-[#e6c419]/10 rounded-sm overflow-hidden relative group">
+            <div className="flex-1 w-full aspect-video md:aspect-[16/10] bg-[#0D2623] border border-[#e6c419]/10 rounded-sm overflow-hidden relative group shadow-2xl">
+                <SectionImage keyword={section.keyword} fallback={section.fallback} />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A1F1C] via-transparent to-transparent pointer-events-none opacity-60" />
                 <div className="absolute inset-0 bg-gradient-to-br from-[#e6c419]/5 to-transparent transition-opacity group-hover:opacity-20" />
-                <div className="flex items-center justify-center h-full text-[#e6c419]/20 font-serif italic text-2xl">
+                <div className="absolute bottom-8 left-8 text-[#e6c419] font-serif italic text-2xl translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700 delay-100">
                     {section.title} Perspective
                 </div>
             </div>
