@@ -45,3 +45,6 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
+server/.env
+client/.env
