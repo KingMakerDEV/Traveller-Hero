@@ -5,6 +5,8 @@ import heritage from "@/assets/heritage.jpg";
 import mountain_hiking from "@/assets/mountain_hiking.jpg";
 import heritage2 from "@/assets/heritage2.jpg";
 import mountain_biking from "@/assets/mountain_biking.jpg";
+import beach from "@/assets/beach.jpg";
+import rainforest from "@/assets/rainforest.jpg";
 
 export const mockTrips: TripState[] = [
   {
@@ -57,6 +59,7 @@ export const mockTrips: TripState[] = [
       { id: "w1", title: "Sumo Tournament", description: "Attend a live sumo wrestling match in Tokyo" },
       { id: "w2", title: "Mount Fuji Climb", description: "Optional overnight climb to the summit of Mt. Fuji" },
     ],
+    rating: 4.9,
   },
   {
     id: "iceland-aurora",
@@ -104,6 +107,7 @@ export const mockTrips: TripState[] = [
       { id: "w1", title: "Snorkeling Silfra", description: "Snorkel between tectonic plates in crystal-clear glacial water" },
       { id: "w2", title: "Helicopter Tour", description: "Aerial tour over active volcanoes and glaciers" },
     ],
+    rating: 4.8,
   },
   {
     id: "peru-expedition",
@@ -150,6 +154,7 @@ export const mockTrips: TripState[] = [
     wildcards: [
       { id: "w1", title: "Rainbow Mountain", description: "Hike to the stunning Vinicunca Rainbow Mountain at 5,200m" },
     ],
+    rating: 4.7,
   },
   {
     id: "norway-fjords",
@@ -197,5 +202,90 @@ export const mockTrips: TripState[] = [
       { id: "w1", title: "Trolltunga Hike", description: "Epic 10-hour hike to the famous Troll's Tongue rock formation" },
       { id: "w2", title: "Northern Lights Flight", description: "Charter flight to chase the aurora borealis" },
     ],
+    rating: 4.9,
+  },
+  {
+    id: "greece-island-hop",
+    title: "Aegean Odyssey",
+    country: "Greece",
+    description: "Sail through turquoise waters, explore white-washed villages, and dine on fresh Mediterranean cuisine. From the sunsets of Santorini to the party pulse of Mykonos.",
+    heroImage: beach,
+    cities: [
+      { name: "Athens", days: 2, highlights: ["Acropolis", "Plaka", "Ancient Agora"], images: [heritage2] },
+      { name: "Mykonos", days: 3, highlights: ["Little Venice", "Windmills", "Super Paradise Beach"], images: [beach] },
+      { name: "Santorini", days: 3, highlights: ["Oia Sunset", "Caldera Hike", "Akrotiri"], images: [shinjuku] },
+    ],
+    itinerary: [],
+    priceEstimate: 2900,
+    duration: "8 Days",
+    included: ["Ferry Tickets", "4-Star Hotels", "All Transfers", "Breakfast"],
+    intent: "Romantic Escape",
+    intent_group: "Connection & Kinship",
+    preferences: ["Beaches", "History", "Nightlife"],
+    wildcards: [],
+    rating: 4.8,
+  },
+  {
+    id: "swiss-alps-trek",
+    title: "Alpine Summits",
+    country: "Switzerland",
+    description: "Breath-taking mountain peaks, crystal-clear lakes, and world-class hiking trails. Experience the peak of luxury and nature in the heart of Europe.",
+    heroImage: mountain_biking,
+    cities: [
+      { name: "Zermatt", days: 3, highlights: ["Matterhorn", "Gornergrat", "Skiing"], images: [snow_climbing] },
+      { name: "Interlaken", days: 3, highlights: ["Jungfraujoch", "Paragliding", "Lake Brienz"], images: [mountain_hiking] },
+      { name: "Lucerne", days: 2, highlights: ["Chapel Bridge", "Mt. Pilatus", "Lion Monument"], images: [heritage] },
+    ],
+    itinerary: [],
+    priceEstimate: 4200,
+    duration: "8 Days",
+    included: ["Swiss Travel Pass", "Mountain Guides", "Luxury Lodges", "Breakfast"],
+    intent: "Adrenaline",
+    intent_group: "High-Energy & Stimulation",
+    preferences: ["Mountains", "Hiking", "Skiing"],
+    wildcards: [],
+    rating: 4.9,
+  },
+  {
+    id: "bali-retreat",
+    title: "Bali Spirit",
+    country: "Indonesia",
+    description: "Spiritual discovery among emerald rice terraces, sacred temples, and tropical beaches. A soul-soothing journey through the Island of the Gods.",
+    heroImage: rainforest,
+    cities: [
+      { name: "Ubud", days: 4, highlights: ["Monkey Forest", "Rice Terraces", "Yoga Retreat"], images: [rainforest] },
+      { name: "Uluwatu", days: 2, highlights: ["Cliff Temple", "Kecak Dance", "Surfing"], images: [beach] },
+      { name: "Seminyak", days: 2, highlights: ["Sunsets", "Beach Clubs", "Spas"], images: [shinjuku] },
+    ],
+    itinerary: [],
+    priceEstimate: 1800,
+    duration: "8 Days",
+    included: ["Private Driver", "Villa Stays", "Yoga Classes", "All Meals"],
+    intent: "Rejuvenation",
+    intent_group: "Restoration & Wellness",
+    preferences: ["Nature", "Spirituality", "Beaches"],
+    wildcards: [],
+    rating: 4.7,
+  },
+  {
+    id: "scotland-highlands",
+    title: "Highland Lore",
+    country: "Scotland",
+    description: "Mystical lochs, ancient castles, and rugged mountains. Trace the history of clans and kingdoms through the dramatic landscapes of the North.",
+    heroImage: heritage2,
+    cities: [
+      { name: "Edinburgh", days: 3, highlights: ["Royal Mile", "Castle", "Whisky Tasting"], images: [heritage2] },
+      { name: "Isle of Skye", days: 3, highlights: ["Old Man of Storr", "Quiraing", "Fairy Pools"], images: [mountain_hiking] },
+      { name: "Inverness", days: 2, highlights: ["Loch Ness", "Culloden Battlefield", "Urquhart Castle"], images: [heritage2] },
+    ],
+    itinerary: [],
+    priceEstimate: 2600,
+    duration: "8 Days",
+    included: ["Castle Tours", "Whisky Tastings", "Boutique Guesthouses", "All Transfers"],
+    intent: "Heritage & Roots",
+    intent_group: "Connection & Kinship",
+    preferences: ["History", "Nature", "Whisky"],
+    wildcards: [],
+    rating: 4.8,
   },
 ];

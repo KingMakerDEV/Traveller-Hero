@@ -91,6 +91,7 @@ const PlannerPage = () => {
                     title={intent.title}
                     description={intent.description}
                     image={intent.image}
+                    imageKeyword={intent.keyword}
                     group={group.title}
                     index={groupIndex * 3 + i}
                     onSelect={() => handleSelectIntent(intent)}

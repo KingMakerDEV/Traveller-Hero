@@ -16,6 +16,10 @@ import AboutPage from "@/pages/AboutPage";
 
 import NotFound from "@/pages/NotFound";
 
+import { useEffect } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
+import ProfilePage from "@/pages/ProfilePage";
+
 const queryClient = new QueryClient();
 
 const AnimatedRoutes = () => {
@@ -26,28 +30,37 @@ const AnimatedRoutes = () => {
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<HomePage />} />
         <Route path="/planner" element={<PlannerPage />} />
-        <Route path="/trip/:tripId" element={<TripDetailPage />} />
+        <Route path="/trip/:slug" element={<TripDetailPage />} />
         <Route path="/loading" element={<LoadingPage />} />
         <Route path="/chat" element={<ChatPlannerPage />} />
         <Route path="/trip-result" element={<TripResultPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Navbar />
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const initAuth = useAuthStore((state) => state.initAuth);
+
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Navbar />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
