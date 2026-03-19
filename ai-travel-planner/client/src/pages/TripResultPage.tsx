@@ -12,23 +12,29 @@ import Footer from "@/components/Footer";
 import { useTripStore } from "@/store/useTripStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
-import { useUnsplashImages, useMultipleUnsplashImages } from "@/hooks/useUnsplashImages";
+import { useUnsplashImages, useMultipleUnsplashImages, useUnsplashImage } from "@/hooks/useUnsplashImages";
 import { formatBudget } from "@/lib/utils";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
 /**
  * Sub-component for individual day images
+ * Each day uses its own page number — guarantees a different photo
+ * even when keywords are similar across days
  */
-const DayImage = ({ keyword, dayIndex, country }: { keyword?: string; dayIndex: number; country: string }) => {
-  const seed = useMemo(() => Math.floor(Math.random() * 1000), []);
-  const { images } = useUnsplashImages(keyword || `Day ${dayIndex + 1} travel ${country}`, 1);
-  const displayImageUrl = images[0] || `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80&sig=${seed}`;
+const DayImage = ({ keyword, dayIndex, country, destination }: { 
+  keyword?: string; 
+  dayIndex: number; 
+  country: string; 
+  destination: string 
+}) => {
+  const searchKeyword = keyword || `${destination} ${country} day ${dayIndex + 1}`;
+  const { imageUrl } = useUnsplashImage(searchKeyword, dayIndex + 1);
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden">
       <img 
-        src={displayImageUrl} 
+        src={imageUrl || `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80`}
         alt={`Day ${dayIndex + 1}`} 
         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
       />
@@ -42,14 +48,21 @@ const DayImage = ({ keyword, dayIndex, country }: { keyword?: string; dayIndex: 
 
 /**
  * Sub-component for review mood images
+ * Each review uses its own page number to get a different mood photo
  */
 const ReviewMoodImage = ({ keyword, index }: { keyword?: string; index: number }) => {
-  const { images } = useUnsplashImages(keyword || "travel highlight", 5);
-  const imageUrl = images[index % images.length] || "https://images.unsplash.com/photo-1520113289666-6799dd215103?w=400&q=80";
+  const { imageUrl } = useUnsplashImage(
+    keyword || "travel highlight landscape",
+    index + 1
+  );
 
   return (
     <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shrink-0 shadow-2xl">
-      <img src={imageUrl} alt="Review mood" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+      <img 
+        src={imageUrl || "https://images.unsplash.com/photo-1520113289666-6799dd215103?w=400&q=80"} 
+        alt="Review mood" 
+        className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+      />
     </div>
   );
 };
@@ -63,12 +76,19 @@ const TripResultPage = () => {
   const { isLoggedIn, token, user, signInWithGoogle } = useAuthStore();
   const [editRequest, setEditRequest] = useState("");
 
-  const heroKeywords = useMemo(() => {
-     const kw = trip?.image_keywords?.hero || [];
+  const heroKeywords = useMemo((): string[] => {
+     let kw: string[] = (trip?.image_keywords?.hero as string[]) || [];
+     if (kw.length === 0) {
+        kw = [
+          `${trip?.destination} ${trip?.country} landscape`,
+          `${trip?.destination} travel aerial`,
+          `${trip?.country} scenery highlights`
+        ];
+     }
      return Array.from(new Set(kw)).slice(0, 3);
   }, [trip]);
   
-  const { images: heroImages } = useMultipleUnsplashImages(heroKeywords, 3);
+  const { images: heroImages } = useMultipleUnsplashImages(heroKeywords);
   const finalHeroImages = useMemo(() => {
      const combined = [...heroImages];
      if (combined.length === 0 && trip?.heroImage) combined.push(trip?.heroImage);
@@ -84,13 +104,11 @@ const TripResultPage = () => {
   }, [finalHeroImages.length]);
 
   useEffect(() => {
-    // Priority 1: Store
     if (selectedTrip && (selectedTrip as any).days) {
       setTrip(selectedTrip);
       return;
     }
 
-    // Priority 2: Session Storage
     const raw = sessionStorage.getItem("trip_result");
     if (!raw) {
       navigate("/planner");
@@ -355,6 +373,7 @@ const TripResultPage = () => {
                     keyword={trip.image_keywords?.days?.[i]} 
                     dayIndex={i} 
                     country={trip.country} 
+                    destination={trip.destination}
                 />
               </div>
             </motion.div>

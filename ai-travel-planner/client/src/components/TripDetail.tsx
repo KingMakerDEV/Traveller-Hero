@@ -12,25 +12,30 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
-import { useUnsplashImages, useMultipleUnsplashImages } from "@/hooks/useUnsplashImages";
-import { RefineTripModal } from "@/components/RefineTripModal";
+import { useUnsplashImages, useMultipleUnsplashImages, useUnsplashImage } from "@/hooks/useUnsplashImages";import { RefineTripModal } from "@/components/RefineTripModal";
 import Footer from "@/components/Footer";
 import { formatBudget } from "@/lib/utils";
 
 /**
  * Sub-component for individual day images to handle hook usage and uniqueness
  */
-const DayImage = ({ keyword, dayIndex, country }: { keyword?: string; dayIndex: number; country: string }) => {
-  const seed = useMemo(() => Math.floor(Math.random() * 1000), []);
-  const searchKeyword = keyword || `Day ${dayIndex + 1} travel ${country}`;
-  const { images } = useUnsplashImages(searchKeyword, 1);
-  
-  const displayImageUrl = images[0] || `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80&sig=${seed}`;
+const DayImage = ({ keyword, dayIndex, country, destination }: { 
+  keyword?: string; 
+  dayIndex: number; 
+  country: string; 
+  destination: string 
+}) => {
+  // Each day uses its own page number — guarantees a different photo
+  // even when keywords are similar across days
+  const searchKeyword = keyword || `${destination} ${country} day ${dayIndex + 1}`;
+  const { imageUrl } = useUnsplashImage(searchKeyword, dayIndex + 1);
+
+  const displayUrl = imageUrl || `https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80`;
 
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden">
       <img 
-        src={displayImageUrl} 
+        src={displayUrl}
         alt={`Day ${dayIndex + 1} highlight`} 
         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" 
       />
@@ -46,16 +51,22 @@ const DayImage = ({ keyword, dayIndex, country }: { keyword?: string; dayIndex: 
  * Sub-component for review mood images
  */
 const ReviewMoodImage = ({ keyword, index }: { keyword?: string; index: number }) => {
-  const { images } = useUnsplashImages(keyword || "travel highlight", 5);
-  const imageUrl = images[index % images.length] || "https://images.unsplash.com/photo-1520113289666-6799dd215103?w=400&q=80";
+  // Each review uses its own page number to get a different mood photo
+  const { imageUrl } = useUnsplashImage(
+    keyword || "travel highlight landscape", 
+    index + 1
+  );
 
   return (
     <div className="w-20 h-20 rounded-2xl overflow-hidden border border-white/10 shrink-0 shadow-2xl">
-      <img src={imageUrl} alt="Review mood" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+      <img 
+        src={imageUrl || "https://images.unsplash.com/photo-1520113289666-6799dd215103?w=400&q=80"} 
+        alt="Review mood" 
+        className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
+      />
     </div>
   );
 };
-
 const TripDetail = ({ trip }: { trip: TripState }) => {
   const prefersReduced = useReducedMotion();
   const navigate = useNavigate();
@@ -79,7 +90,14 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
 
   // Hero Image Fetching
   const heroKeywords = useMemo(() => {
-     const kw = trip?.image_keywords?.hero || [];
+     let kw = trip?.image_keywords?.hero || [];
+     if (kw.length === 0) {
+        kw = [
+          `${trip?.destination} ${trip?.country} travel adventure`,
+          `${trip?.destination} city lights landscape`,
+          `${trip?.country} iconic nature views`
+        ];
+     }
      return Array.from(new Set(kw)).slice(0, 3);
   }, [trip]);
   
@@ -429,6 +447,7 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
                     keyword={trip.image_keywords?.days?.[i]} 
                     dayIndex={i} 
                     country={trip.country} 
+                    destination={trip.destination}
                 />
               </div>
             </motion.div>
@@ -602,13 +621,15 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
                 Refine Strategy
               </Button>
             )}
-            <Button
-              onClick={handleBook}
-              disabled={isBooking}
-              className="bg-stone-100 text-[#0A1F1C] hover:bg-white font-bold uppercase tracking-widest px-12 h-16 rounded-full transition-all w-full sm:w-auto"
-            >
-              {isBooking ? "Securing..." : "Book This Trip"}
-            </Button>
+            {user?.id !== trip.user_id && (
+              <Button
+                onClick={handleBook}
+                disabled={isBooking}
+                className="bg-stone-100 text-[#0A1F1C] hover:bg-white font-bold uppercase tracking-widest px-12 h-16 rounded-full transition-all w-full sm:w-auto"
+              >
+                {isBooking ? "Securing..." : "Book This Trip"}
+              </Button>
+            )}
             <Button
               onClick={() => {
                 sessionStorage.setItem("suggested_intent", JSON.stringify({
