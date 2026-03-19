@@ -1,7 +1,7 @@
 """
 trips.py — Trip management endpoints.
 
-GET  /popular-trips        — Returns 8 most recent public trips with ratings
+GET  /popular-trips        — Returns 8 manually seeded demo trips with ratings
 GET  /trip/<slug>          — Returns full trip data by slug
 POST /trip/save            — Saves a user's own generated trip to Supabase
 POST /trip/book/<slug>     — Books an existing public trip to user's profile
@@ -43,8 +43,9 @@ def verify_token_from_header(request) -> dict | None:
 @trips_bp.route("/popular-trips", methods=["GET", "OPTIONS"])
 def get_popular_trips():
     """
-    Returns the 8 most recent public trips with average rating.
-    Used by the homepage to display popular trip cards.
+    Returns the 8 manually seeded demo trips with average rating.
+    Only returns trips where user_id IS NULL — these are the demo trips
+    inserted by seed_trips.py. User-generated trips are never shown here.
     """
     if request.method == "OPTIONS":
         return jsonify({"ok": True}), 200
@@ -54,10 +55,12 @@ def get_popular_trips():
     try:
         supabase = get_supabase()
 
-        # Fetch 8 most recent public trips including image_keywords
+        # Only fetch demo trips — user_id is null for all seeded trips
         trips_result = supabase.table("trips").select(
             "id, slug, title, destination, country, duration_days, summary, intent, created_at, image_keywords"
-        ).eq("is_public", True).order(
+        ).eq("is_public", True).is_(
+            "user_id", "null"
+        ).order(
             "created_at", desc=True
         ).limit(8).execute()
 
@@ -83,7 +86,7 @@ def get_popular_trips():
                 "review_count": len(reviews)
             })
 
-        print(f"POPULAR TRIPS: Returning {len(enriched_trips)} trips")
+        print(f"POPULAR TRIPS: Returning {len(enriched_trips)} demo trips")
 
         return jsonify({
             "ok": True,
@@ -361,8 +364,6 @@ def delete_trip(slug: str):
 
         trip = trip_result.data
 
-        # Both generated and booked trips can be deleted by their owner
-        # For booked trips owner is the person who booked it not the original creator
         if trip["user_id"] != user["id"]:
             return jsonify({
                 "ok": False,

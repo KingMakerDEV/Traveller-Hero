@@ -218,7 +218,7 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
       const data = await response.json();
       if (response.ok) {
         toast.success("Trip successfully added to your missions!");
-        navigate(`/trip/${data.slug}`);
+        navigate("/profile");
       } else {
         toast.error(data.error || "Failed to book trip");
       }
