@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
-import { Trash2, MapPin, Calendar, ArrowRight, User as UserIcon, LogOut, Star } from "lucide-react";
+import { Trash2, MapPin, Calendar, ArrowRight, User as UserIcon, LogOut, Star, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
 import { useUnsplashImages } from "@/hooks/useUnsplashImages";
@@ -24,6 +24,7 @@ interface SavedTrip {
   destination: string;
   date: string;
   image?: string;
+  is_completed?: boolean;
   image_keywords?: ImageKeywords;
 }
 
@@ -31,11 +32,21 @@ const TripThumbnail = ({ trip }: { trip: SavedTrip }) => {
   const keyword = trip.image_keywords?.card || `${trip.destination} travel`;
   const { images } = useUnsplashImages(keyword, 1);
   return (
-    <img 
-      src={images[0] || trip.image || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80"} 
-      alt={trip.title}
-      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-    />
+    <div className="relative w-full h-full">
+      <img 
+        src={images[0] || trip.image || "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80"} 
+        alt={trip.title}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+      />
+      {trip.is_completed && (
+        <div className="absolute top-4 left-4 z-20">
+          <div className="bg-[#e6c419] text-[#0A1F1C] text-[10px] font-mono font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shadow-lg border border-[#0A1F1C]/20 flex items-center gap-1.5 backdrop-blur-sm">
+            <CheckCircle2 size={12} />
+            Mission Accomplished
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -88,11 +99,36 @@ const ProfilePage = () => {
       });
       if (response.ok) {
         setTrips((prev) => prev.filter((t) => t.slug !== slug));
+        toast.success("Trip plan deleted.");
       }
     } catch (error) {
       console.error("Delete failed:", error);
+      toast.error("Failed to delete trip.");
     }
   };
+
+  const handleComplete = async (slug: string) => {
+    try {
+      const response = await fetch(`${API_URL}/trip/${slug}/complete`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        setTrips((prev) => prev.map(t => 
+          t.slug === slug ? { ...t, is_completed: true } : t
+        ));
+        toast.success("Mission accomplished! Trip marked as completed.");
+      }
+    } catch (error) {
+      console.error("Completion failed:", error);
+      toast.error("Failed to update mission status.");
+    }
+  };
+
+  const activeTrips = trips.filter(t => !t.is_completed);
+  const completedTrips = trips.filter(t => t.is_completed);
 
   if (isLoading || fetchingTrips) {
     return (
@@ -136,25 +172,25 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Saved Trips */}
-        <div>
+        {/* Active Journeys */}
+        <div className="mb-20">
           <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
             Your Saved Journeys
             <span className="bg-[#e6c419] text-[#0A1F1C] text-xs font-mono px-2 py-0.5 rounded-full">
-              {trips.length}
+              {activeTrips.length}
             </span>
           </h2>
 
-          {trips.length === 0 ? (
+          {activeTrips.length === 0 ? (
             <div className="bg-[#142A27] rounded-2xl py-20 text-center border border-dashed border-white/10">
-              <p className="text-stone-500 mb-6">You haven't saved any trip plans yet.</p>
+              <p className="text-stone-500 mb-6">You don't have any active trip plans yet.</p>
               <Button asChild className="bg-[#e6c419] text-[#0A1F1C] hover:bg-[#d4b517] font-bold">
                 <Link to="/planner">Start Planning</Link>
               </Button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {trips.map((trip) => (
+              {activeTrips.map((trip) => (
                 <motion.div
                   key={trip.id}
                   whileHover={{ y: -5 }}
@@ -166,7 +202,7 @@ const ProfilePage = () => {
                   </div>
                   
                   <div className="p-6">
-                    <h3 className="text-xl font-bold text-white mb-4 group-hover:text-[#e6c419] transition-colors line-clamp-1">
+                    <h3 className="text-xl font-bold text-white group-hover:text-[#e6c419] transition-colors line-clamp-1 mb-4">
                       {trip.title}
                     </h3>
                     
@@ -185,9 +221,19 @@ const ProfilePage = () => {
                       <Button asChild className="flex-grow bg-[#142A27] border border-white/10 hover:border-[#e6c419] hover:bg-[#1a3531] text-white">
                         <Link to={`/trip/${trip.slug}`}>
                           View Details
-                          <ArrowRight size={14} className="ml-2" />
                         </Link>
                       </Button>
+                      
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => handleComplete(trip.slug)}
+                        title="Mark as Completed"
+                        className="text-stone-500 hover:text-[#e6c419] hover:bg-[#e6c419]/10"
+                      >
+                        <CheckCircle2 size={18} />
+                      </Button>
+
                       <Button 
                         size="icon" 
                         variant="ghost" 
@@ -209,7 +255,72 @@ const ProfilePage = () => {
             </div>
           )}
         </div>
+
+        {/* Completed Journeys */}
+        {completedTrips.length > 0 && (
+          <div className="pt-12 border-t border-white/5">
+            <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+              Journeys completed
+              <span className="bg-[#e6c419] text-[#0A1F1C] text-xs font-mono px-2 py-0.5 rounded-full">
+                {completedTrips.length}
+              </span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {completedTrips.map((trip) => (
+                <motion.div
+                  key={trip.id}
+                  whileHover={{ y: -5 }}
+                  className="bg-[#142A27] rounded-2xl overflow-hidden border border-white/5 group shadow-lg opacity-80"
+                >
+                  <div className="h-48 relative overflow-hidden bg-stone-800">
+                    <TripThumbnail trip={trip} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A1F1C] via-transparent to-transparent opacity-60"></div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-xl font-bold text-white group-hover:text-[#e6c419] transition-colors line-clamp-1 flex-grow">
+                        {trip.title}
+                      </h3>
+                      <CheckCircle2 size={20} className="text-[#e6c419] flex-shrink-0" />
+                    </div>
+                    
+                    <div className="space-y-3 mb-8">
+                      <div className="flex items-center gap-2 text-stone-400 text-sm">
+                        <MapPin size={14} className="text-[#e6c419]" />
+                        <span>{trip.destination}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-stone-400 text-sm">
+                        <Calendar size={14} className="text-[#e6c419]" />
+                        <span>{trip.date}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <Button asChild className="flex-grow bg-[#142A27] border border-white/10 hover:border-[#e6c419] hover:bg-[#1a3531] text-white">
+                        <Link to={`/trip/${trip.slug}`}>
+                          View History
+                        </Link>
+                      </Button>
+                      
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => handleDelete(trip.slug)}
+                        className="text-stone-500 hover:text-red-500 hover:bg-red-500/10"
+                      >
+                        <Trash2 size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
       <Footer />
     </motion.main>
   );

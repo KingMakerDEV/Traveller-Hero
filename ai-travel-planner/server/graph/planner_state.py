@@ -3,7 +3,7 @@ planner_state.py — Shared TypedDict state for the conversational trip planner.
 Every agent and the workflow reads and writes to this structure.
 """
 
-from typing import TypedDict, List, Optional
+from typing import TypedDict, List, Optional, Any
 
 
 class Question(TypedDict):
@@ -22,6 +22,14 @@ class TripDay(TypedDict):
     food: str
 
 
+class BudgetCategory(TypedDict):
+    """A single category in the budget breakdown."""
+    category: str
+    amount: str
+    percentage: int
+    description: str
+
+
 class TripPlan(TypedDict):
     """The final completed trip plan returned to the user."""
     title: str
@@ -33,6 +41,7 @@ class TripPlan(TypedDict):
     days: List[TripDay]
     packing_tips: List[str]
     estimated_budget: str
+    budget_breakdown: List[BudgetCategory]
 
 
 class PlannerState(TypedDict):

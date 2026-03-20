@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -16,24 +15,23 @@ def _get_client() -> OpenAI:
 
 
 SYSTEM_PROMPT = """
-You are TravellerHero's master trip architect. You receive:
-1. A complete psychological profile of the traveller built through conversation
-2. Real-time research data from web searches about the destination
+You are TravellerHero's master trip architect. Based on a complete psychological
+profile of the traveller built through a conversation, you generate a highly
+specific, deeply personalised trip plan that the user could never have come up
+with themselves.
 
-Your job is to use BOTH the traveller profile AND the research data to generate
-a highly specific, deeply personalised trip plan grounded in real current information.
+Your trip plan must feel surprising yet inevitable — when the user reads it they
+should think "yes, this is exactly what I needed even though I never knew it."
 
 Rules:
-- Choose a specific destination based on the traveller profile and research
-- Use the research data to name real places, real restaurants, real activities
-- Cross-reference the research with the traveller's psychological intent
-- The itinerary must feel surprising yet inevitable
-- Each day must have a distinct theme that builds on the previous day
-- Activities must be specific — use real place names from the research
-- The plan must feel human and curated, not like a generic travel blog
-- All prices and budgets must be in Indian Rupees using the ₹ symbol
-- Estimated budget should reflect realistic costs for Indian travellers
-  including flights from major Indian cities
+- Choose a specific destination, not a vague region. Name the exact place.
+- The itinerary must match the user's psychological intent perfectly.
+- Each day must have a distinct theme that builds on the previous day.
+- Activities must be specific — name actual places, trails, restaurants, experiences.
+- The plan must feel human and curated, not like a generic travel blog.
+- All prices and budgets must be in Indian Rupees using the ₹ symbol.
+- Estimated budget should reflect realistic costs for Indian travellers including flights from major Indian cities.
+- Budget breakdown categories must be decided based on the trip type — adventure trips have high activity costs, wellness trips have high accommodation costs, city trips have high food costs etc.
 - Always respond in valid JSON only. No markdown, no explanation, no extra text.
 
 Response format:
@@ -64,7 +62,45 @@ Response format:
     "Tip 3",
     "Tip 4"
   ],
-  "estimated_budget": "₹85,000 - ₹1,20,000 per person including flights from Delhi"
+  "estimated_budget": "₹85,000 - ₹1,20,000 per person including flights from Delhi",
+  "budget_breakdown": [
+    {
+      "category": "Flights",
+      "amount": "₹35,000 - ₹45,000",
+      "percentage": 38,
+      "description": "Return flights from Delhi including taxes"
+    },
+    {
+      "category": "Accommodation",
+      "amount": "₹20,000 - ₹28,000",
+      "percentage": 24,
+      "description": "7 nights at mid-range hotels or eco-lodges"
+    },
+    {
+      "category": "Food",
+      "amount": "₹8,000 - ₹12,000",
+      "percentage": 11,
+      "description": "Local restaurants and street food daily"
+    },
+    {
+      "category": "Activities",
+      "amount": "₹12,000 - ₹18,000",
+      "percentage": 15,
+      "description": "Guided tours, entry fees, adventure sports"
+    },
+    {
+      "category": "Transport",
+      "amount": "₹7,000 - ₹10,000",
+      "percentage": 9,
+      "description": "Local transport, taxis, transfers"
+    },
+    {
+      "category": "Miscellaneous",
+      "amount": "₹3,000 - ₹7,000",
+      "percentage": 5,
+      "description": "Shopping, tips, emergency buffer"
+    }
+  ]
 }
 """
 
@@ -99,7 +135,6 @@ def build_trip_prompt(state: PlannerState, research: dict) -> str:
     if state.get("context_summary"):
         lines.append(f"\nPsychological profile summary: {state['context_summary']}")
 
-    # Inject real-time research results
     if research:
         lines.append("\n" + "="*50)
         lines.append("REAL-TIME RESEARCH DATA (use this to ground your recommendations):")
@@ -125,6 +160,8 @@ def build_trip_prompt(state: PlannerState, research: dict) -> str:
         "\nBased on the traveller profile AND the research data above, "
         "generate the perfect trip plan. Use real place names from the research. "
         "The destination should match both the psychological intent and the research findings."
+        "\nIMPORTANT: You MUST include the budget_breakdown array in your response. "
+        "It is required. Do not omit it."
     )
 
     return "\n".join(lines)
@@ -190,11 +227,9 @@ def run_trip_builder_agent(state: PlannerState) -> PlannerState:
         state["session_id"]
     )
 
-    # Step 1 — Determine destination for targeted research
     destination, country = _determine_destination_for_research(state)
     logger.info("Pre-selected destination: %s, %s", destination, country)
 
-    # Step 2 — Run real-time research if Tavily is available
     research = {}
     if destination and os.environ.get("TAVILY_API_KEY"):
         try:
@@ -216,7 +251,6 @@ def run_trip_builder_agent(state: PlannerState) -> PlannerState:
             "Skipping research — destination empty or TAVILY_API_KEY not set"
         )
 
-    # Step 3 — Generate trip plan with research context
     client = _get_client()
     user_message = build_trip_prompt(state, research)
 
@@ -228,13 +262,12 @@ def run_trip_builder_agent(state: PlannerState) -> PlannerState:
                 {"role": "user", "content": user_message}
             ],
             temperature=0.8,
-            max_tokens=2500
+            max_tokens=3500  # increased from 2500 to fit budget_breakdown
         )
 
         raw = response.choices[0].message.content.strip()
         logger.info("Trip builder raw response length: %d chars", len(raw))
 
-        # Strip markdown fences if present
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -243,7 +276,15 @@ def run_trip_builder_agent(state: PlannerState) -> PlannerState:
 
         parsed = json.loads(raw)
 
-        # Build validated TripPlan
+        # Log whether budget_breakdown was returned
+        if parsed.get("budget_breakdown"):
+            logger.info(
+                "Budget breakdown included: %d categories",
+                len(parsed["budget_breakdown"])
+            )
+        else:
+            logger.warning("Budget breakdown MISSING from LLM response")
+
         days: list[TripDay] = []
         for d in parsed.get("days", []):
             days.append({
@@ -264,7 +305,8 @@ def run_trip_builder_agent(state: PlannerState) -> PlannerState:
             "summary": parsed.get("summary", ""),
             "days": days,
             "packing_tips": parsed.get("packing_tips", []),
-            "estimated_budget": parsed.get("estimated_budget", "")
+            "estimated_budget": parsed.get("estimated_budget", ""),
+            "budget_breakdown": parsed.get("budget_breakdown", [])  # fixed — was missing
         }
 
         logger.info(
@@ -284,7 +326,8 @@ def run_trip_builder_agent(state: PlannerState) -> PlannerState:
             "summary": "A trip crafted entirely around how you want to feel.",
             "days": [],
             "packing_tips": ["Travel light", "Stay curious"],
-            "estimated_budget": "₹85,000 - ₹1,20,000 per person"
+            "estimated_budget": "₹85,000 - ₹1,20,000 per person",
+            "budget_breakdown": []
         }
 
     except Exception as e:
