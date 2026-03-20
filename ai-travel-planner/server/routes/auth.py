@@ -9,6 +9,7 @@ import logging
 import traceback
 from flask import Blueprint, request, jsonify
 from utils.supabase_client import get_supabase
+from utils.mail import send_welcome_email
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,7 @@ def verify_token():
     """
     Verifies a Supabase JWT token sent from the frontend.
     Creates a profile row in public.profiles if first login.
+    Sends welcome email on first login only using welcome_email_sent flag.
     Returns the user profile data.
 
     Expects: { token: string }
@@ -52,10 +54,34 @@ def verify_token():
         user = user_response.user
         user_id = user.id
         email = user.email
-        full_name = user.user_metadata.get("full_name", "") or user.user_metadata.get("name", "")
-        avatar_url = user.user_metadata.get("avatar_url", "") or user.user_metadata.get("picture", "")
+        full_name = (
+            user.user_metadata.get("full_name", "")
+            or user.user_metadata.get("name", "")
+        )
+        avatar_url = (
+            user.user_metadata.get("avatar_url", "")
+            or user.user_metadata.get("picture", "")
+        )
 
         print(f"AUTH: Verified user {email} ({user_id})")
+
+        # Check if this profile already exists to detect first login
+        existing_profile = supabase.table("profiles").select(
+            "id, welcome_email_sent"
+        ).eq("id", user_id).execute()
+
+        is_first_login = (
+            not existing_profile.data
+            or len(existing_profile.data) == 0
+        )
+
+        # If profile exists check the welcome_email_sent flag
+        if existing_profile.data and len(existing_profile.data) > 0:
+            is_first_login = not existing_profile.data[0].get(
+                "welcome_email_sent", False
+            )
+
+        print(f"AUTH: First login = {is_first_login} for {email}")
 
         # Upsert profile — creates on first login, updates on subsequent logins
         profile_data = {
@@ -66,8 +92,20 @@ def verify_token():
             "updated_at": "now()"
         }
 
+        # On first login also set welcome_email_sent to True
+        if is_first_login:
+            profile_data["welcome_email_sent"] = True
+
         supabase.table("profiles").upsert(profile_data).execute()
         print(f"AUTH: Profile upserted for {email}")
+
+        # Send welcome email in background thread — only on first login
+        if is_first_login:
+            print(f"AUTH: Sending welcome email to {email}")
+            send_welcome_email(
+                full_name=full_name or email.split("@")[0],
+                user_email=email
+            )
 
         return jsonify({
             "ok": True,
@@ -114,14 +152,18 @@ def get_profile():
         user_id = user_response.user.id
 
         # Fetch profile
-        profile_result = supabase.table("profiles").select("*").eq("id", user_id).single().execute()
+        profile_result = supabase.table("profiles").select(
+            "*"
+        ).eq("id", user_id).single().execute()
 
         if not profile_result.data:
             return jsonify({"ok": False, "error": "Profile not found"}), 404
 
-        # Fetch user's saved trips
+        # Fetch user's saved trips including completion status
         trips_result = supabase.table("trips").select(
-            "id, slug, title, destination, country, duration_days, summary, intent, created_at"
+            "id, slug, title, destination, country, duration_days, "
+            "summary, intent, created_at, is_completed, completed_at, "
+            "image_keywords, booking_source"
         ).eq("user_id", user_id).order("created_at", desc=True).execute()
 
         print(f"PROFILE: Loaded {len(trips_result.data)} trips for user {user_id}")
