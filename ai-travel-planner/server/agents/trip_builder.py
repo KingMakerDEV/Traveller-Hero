@@ -1,11 +1,4 @@
 
-"""
-trip_builder.py — Agent that generates the final trip plan.
-Now uses real-time Tavily search results before LLM generation.
-Called only when conversation agent sets ready_to_plan = True.
-Uses Nvidia NIM (meta/llama-3.3-70b-instruct) via OpenAI-compatible endpoint.
-"""
-
 import json
 import logging
 import os
