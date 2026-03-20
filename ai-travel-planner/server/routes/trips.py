@@ -1,11 +1,12 @@
 """
 trips.py — Trip management endpoints.
 
-GET  /popular-trips        — Returns 8 manually seeded demo trips with ratings
-GET  /trip/<slug>          — Returns full trip data by slug
-POST /trip/save            — Saves a user's own generated trip to Supabase
-POST /trip/book/<slug>     — Books an existing public trip to user's profile
-DELETE /trip/<slug>        — Deletes a trip (owner only)
+GET   /popular-trips          — Returns 8 manually seeded demo trips with ratings
+GET   /trip/<slug>            — Returns full trip data by slug
+POST  /trip/save              — Saves a user's own generated trip to Supabase
+POST  /trip/book/<slug>       — Books an existing public trip to user's profile
+DELETE /trip/<slug>           — Deletes a trip (owner only)
+PATCH  /trip/<slug>/complete  — Marks a trip as completed
 """
 
 import logging
@@ -13,6 +14,7 @@ import traceback
 from flask import Blueprint, request, jsonify
 from utils.supabase_client import get_supabase
 from utils.slug import generate_unique_slug
+from utils.mail import send_booking_confirmation_email
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +36,27 @@ def verify_token_from_header(request) -> dict | None:
         supabase = get_supabase()
         user_response = supabase.auth.get_user(token)
         if user_response and user_response.user:
-            return {"id": user_response.user.id, "email": user_response.user.email}
+            return {
+                "id": user_response.user.id,
+                "email": user_response.user.email
+            }
         return None
     except Exception:
         return None
+
+
+def _get_user_full_name(user_id: str) -> str:
+    """Fetch user's full name from profiles table for email personalisation."""
+    try:
+        supabase = get_supabase()
+        result = supabase.table("profiles").select(
+            "full_name"
+        ).eq("id", user_id).single().execute()
+        if result.data:
+            return result.data.get("full_name", "") or ""
+        return ""
+    except Exception:
+        return ""
 
 
 @trips_bp.route("/popular-trips", methods=["GET", "OPTIONS"])
@@ -55,7 +74,6 @@ def get_popular_trips():
     try:
         supabase = get_supabase()
 
-        # Only fetch demo trips — user_id is null for all seeded trips
         trips_result = supabase.table("trips").select(
             "id, slug, title, destination, country, duration_days, summary, intent, created_at, image_keywords"
         ).eq("is_public", True).is_(
@@ -66,7 +84,6 @@ def get_popular_trips():
 
         trips = trips_result.data or []
 
-        # For each trip fetch its average rating from reviews
         enriched_trips = []
         for trip in trips:
             reviews_result = supabase.table("reviews").select(
@@ -122,7 +139,6 @@ def get_trip_by_slug(slug: str):
 
         trip = result.data
 
-        # Fetch reviews for this trip
         reviews_result = supabase.table("reviews").select("*").eq(
             "trip_id", trip["id"]
         ).order("created_at", desc=True).execute()
@@ -155,7 +171,7 @@ def get_trip_by_slug(slug: str):
 def save_trip():
     """
     Saves a user's own AI-generated trip to Supabase.
-    Called from TripResultPage after the AI generates a plan.
+    Sends booking confirmation email after successful save.
     Requires Authorization header with valid Supabase JWT.
 
     Expects: {
@@ -221,6 +237,24 @@ def save_trip():
         saved_trip = result.data[0]
         print(f"SAVE TRIP: Saved '{saved_trip['title']}' with slug '{slug}'")
 
+        # Send booking confirmation email in background thread
+        try:
+            full_name = _get_user_full_name(user["id"])
+            send_booking_confirmation_email(
+                full_name=full_name or user["email"].split("@")[0],
+                user_email=user["email"],
+                trip_title=trip_data.get("title", ""),
+                destination=trip_data.get("destination", ""),
+                country=trip_data.get("country", ""),
+                duration_days=trip_data.get("duration_days", 7),
+                estimated_budget=trip_data.get("estimated_budget", ""),
+                slug=slug
+            )
+            print(f"SAVE TRIP: Booking confirmation email queued for {user['email']}")
+        except Exception as email_err:
+            # Email failure must never block the trip save response
+            logger.error("Failed to queue booking confirmation email: %s", email_err)
+
         return jsonify({
             "ok": True,
             "slug": slug,
@@ -237,9 +271,7 @@ def save_trip():
 def book_trip(source_slug: str):
     """
     Books an existing public trip to the logged-in user's profile.
-    Called from TripDetail page when user clicks "Book This Trip".
-    Creates a private copy of the trip linked to the user.
-    Prevents duplicate bookings of the same trip by the same user.
+    Sends booking confirmation email after successful booking.
     Requires Authorization header with valid Supabase JWT.
 
     Returns: { ok: true, slug: string, trip_id: string, already_booked: bool }
@@ -259,7 +291,6 @@ def book_trip(source_slug: str):
 
         supabase = get_supabase()
 
-        # Fetch the original public trip from database
         source_result = supabase.table("trips").select("*").eq(
             "slug", source_slug
         ).eq("is_public", True).single().execute()
@@ -269,7 +300,6 @@ def book_trip(source_slug: str):
 
         source_trip = source_result.data
 
-        # Prevent duplicate bookings — check if user already booked this trip
         duplicate_check = supabase.table("trips").select("id, slug").eq(
             "user_id", user["id"]
         ).eq(
@@ -286,7 +316,6 @@ def book_trip(source_slug: str):
                 "already_booked": True
             }), 200
 
-        # Generate a new unique slug for this user's copy
         slug = generate_unique_slug(source_trip["title"])
 
         insert_data = {
@@ -318,6 +347,25 @@ def book_trip(source_slug: str):
             f"'{source_trip['title']}' as '{slug}'"
         )
 
+        # Send booking confirmation email in background thread
+        try:
+            full_name = _get_user_full_name(user["id"])
+            send_booking_confirmation_email(
+                full_name=full_name or user["email"].split("@")[0],
+                user_email=user["email"],
+                trip_title=source_trip["title"],
+                destination=source_trip["destination"],
+                country=source_trip["country"],
+                duration_days=source_trip["duration_days"],
+                estimated_budget=source_trip.get(
+                    "trip_data", {}
+                ).get("estimated_budget", ""),
+                slug=slug
+            )
+            print(f"BOOK TRIP: Confirmation email queued for {user['email']}")
+        except Exception as email_err:
+            logger.error("Failed to queue booking confirmation email: %s", email_err)
+
         return jsonify({
             "ok": True,
             "slug": slug,
@@ -327,6 +375,69 @@ def book_trip(source_slug: str):
 
     except Exception as e:
         print("BOOK TRIP ERROR:", e)
+        traceback.print_exc()
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@trips_bp.route("/trip/<slug>/complete", methods=["PATCH", "OPTIONS"])
+def complete_trip(slug: str):
+    """
+    Marks a trip as completed.
+    Sets is_completed = True and completed_at = now().
+    Only the trip owner can mark it as completed.
+    Requires Authorization header with valid Supabase JWT.
+
+    Returns: { ok: true }
+    """
+    if request.method == "OPTIONS":
+        return jsonify({"ok": True}), 200
+
+    print(f"\n--- COMPLETE TRIP: {slug} ---")
+
+    try:
+        user = verify_token_from_header(request)
+        if not user:
+            return jsonify({
+                "ok": False,
+                "error": "You must be logged in to mark a trip as completed"
+            }), 401
+
+        supabase = get_supabase()
+
+        # Verify trip exists and belongs to this user
+        trip_result = supabase.table("trips").select(
+            "id, user_id, title, is_completed"
+        ).eq("slug", slug).single().execute()
+
+        if not trip_result.data:
+            return jsonify({"ok": False, "error": "Trip not found"}), 404
+
+        trip = trip_result.data
+
+        if trip["user_id"] != user["id"]:
+            return jsonify({
+                "ok": False,
+                "error": "You do not have permission to update this trip"
+            }), 403
+
+        if trip.get("is_completed"):
+            return jsonify({
+                "ok": True,
+                "message": "Trip is already marked as completed"
+            }), 200
+
+        # Mark as completed
+        supabase.table("trips").update({
+            "is_completed": True,
+            "completed_at": "now()"
+        }).eq("slug", slug).execute()
+
+        print(f"COMPLETE TRIP: '{trip['title']}' marked completed by {user['id']}")
+
+        return jsonify({"ok": True}), 200
+
+    except Exception as e:
+        print("COMPLETE TRIP ERROR:", e)
         traceback.print_exc()
         return jsonify({"ok": False, "error": str(e)}), 500
 

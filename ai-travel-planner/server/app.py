@@ -1,3 +1,5 @@
+
+
 """
 app.py — Main Flask Application Entry Point
 
@@ -47,12 +49,15 @@ print("ENV SMTP_SENDER_EMAIL =", os.getenv("SMTP_SENDER_EMAIL"))
 print("ENV NVIDIA_API_KEY =", "set" if os.getenv("NVIDIA_API_KEY") else "NOT SET")
 print("ENV SUPABASE_URL =", os.getenv("SUPABASE_URL"))
 print("ENV SUPABASE_KEY =", "set" if os.getenv("SUPABASE_SERVICE_ROLE_KEY") else "NOT SET")
+print("ENV BREVO_API_KEY =", "set" if os.getenv("BREVO_API_KEY") else "NOT SET")
+print("ENV DUFFEL_API_KEY =", "set" if os.getenv("DUFFEL_API_KEY") else "NOT SET")
+print("ENV TAVILY_API_KEY =", "set" if os.getenv("TAVILY_API_KEY") else "NOT SET")
 print("--------------------------------")
 
 # Initialize Flask
 app = Flask(__name__)
 
-# Enable CORS for all routes
+# Enable CORS for all routes — PATCH added for trip completion endpoint
 CORS(app,
     resources={r"/*": {
         "origins": [
@@ -62,7 +67,7 @@ CORS(app,
             "http://127.0.0.1:5173",
             "http://127.0.0.1:8080"
         ],
-        "methods": ["GET", "POST", "DELETE", "OPTIONS"],
+        "methods": ["GET", "POST", "DELETE", "PATCH", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "max_age": 3600
     }}
@@ -98,7 +103,10 @@ def health_check():
         "status": "healthy",
         "graph_loaded": master_graph is not None,
         "nvidia_key_set": bool(os.getenv("NVIDIA_API_KEY")),
-        "supabase_connected": bool(os.getenv("SUPABASE_URL"))
+        "supabase_connected": bool(os.getenv("SUPABASE_URL")),
+        "brevo_configured": bool(os.getenv("BREVO_API_KEY")),
+        "duffel_configured": bool(os.getenv("DUFFEL_API_KEY")),
+        "tavily_configured": bool(os.getenv("TAVILY_API_KEY"))
     }), 200
 
 
