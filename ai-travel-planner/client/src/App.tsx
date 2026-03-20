@@ -12,6 +12,7 @@ import TripDetailPage from "@/pages/TripDetailPage";
 import LoadingPage from "@/pages/LoadingPage";
 import ChatPlannerPage from "@/pages/ChatPlannerPage";
 import TripResultPage from "@/pages/TripResultPage";
+import BookingPage from "@/pages/BookingPage";
 import AboutPage from "@/pages/AboutPage";
 
 import NotFound from "@/pages/NotFound";
@@ -31,6 +32,7 @@ const AnimatedRoutes = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/planner" element={<PlannerPage />} />
         <Route path="/trip/:slug" element={<TripDetailPage />} />
+        <Route path="/booking/:slug" element={<BookingPage />} />
         <Route path="/loading" element={<LoadingPage />} />
         <Route path="/chat" element={<ChatPlannerPage />} />
         <Route path="/trip-result" element={<TripResultPage />} />
