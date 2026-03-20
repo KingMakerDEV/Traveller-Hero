@@ -6,6 +6,8 @@ import TripDetail from "@/components/TripDetail";
 import LoadingAgents from "@/components/LoadingAgents";
 import Footer from "@/components/Footer";
 import { useTripStore } from "@/store/useTripStore";
+import ShareButton from "@/components/ShareButton";
+import BudgetBreakdown from "@/components/BudgetBreakdown";
 
 const TripDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();

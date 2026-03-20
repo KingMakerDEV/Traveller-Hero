@@ -8,6 +8,8 @@ import {
     Bed, Utensils, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ShareButton from "@/components/ShareButton";
+import BudgetBreakdown from "@/components/BudgetBreakdown";
 import Footer from "@/components/Footer";
 import { useTripStore } from "@/store/useTripStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -312,7 +314,7 @@ const TripResultPage = () => {
              <div className="flex items-center gap-3 bg-[#142A27] px-8 py-4 rounded-2xl border border-[#e6c419]/30 shadow-xl">
                 <IndianRupee size={20} className="text-[#e6c419]" />
                 <span className="text-[#e6c419] font-bold">{formatBudget(trip.estimated_budget)}</span>
-             </div>
+              </div>
           </div>
         </div>
       </section>
@@ -381,6 +383,14 @@ const TripResultPage = () => {
         </div>
       </section>
 
+      {/* BUDGET BREAKDOWN */}
+      {trip.budget_breakdown && trip.budget_breakdown.length > 0 && (
+        <BudgetBreakdown
+          breakdown={trip.budget_breakdown}
+          total={trip.estimated_budget}
+        />
+      )}
+
       {/* PACKING TIPS */}
       <section className="bg-[#0D2623] py-32 border-y border-white/10 text-center">
         <div className="container mx-auto px-6 max-w-6xl">
@@ -404,6 +414,8 @@ const TripResultPage = () => {
           </div>
         </div>
       </section>
+
+
 
       {/* REVIEWS MOCKUP */}
       <section className="py-32">
@@ -445,6 +457,10 @@ const TripResultPage = () => {
            </div>
 
            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+              <ShareButton
+                tripTitle={trip.title}
+                slug={trip.slug || ""}
+              />
               <Button
                 variant="outline"
                 onClick={handleEdit}

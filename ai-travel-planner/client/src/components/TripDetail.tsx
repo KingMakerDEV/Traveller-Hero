@@ -12,7 +12,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
-import { useUnsplashImages, useMultipleUnsplashImages, useUnsplashImage } from "@/hooks/useUnsplashImages";import { RefineTripModal } from "@/components/RefineTripModal";
+import { useUnsplashImages, useMultipleUnsplashImages, useUnsplashImage } from "@/hooks/useUnsplashImages";
+import { RefineTripModal } from "@/components/RefineTripModal";
+import ShareButton from "@/components/ShareButton";
+import BudgetBreakdown from "@/components/BudgetBreakdown";
 import Footer from "@/components/Footer";
 import { formatBudget } from "@/lib/utils";
 
@@ -291,6 +294,12 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
             <h1 className="text-white font-serif italic text-4xl md:text-[4.5rem] leading-[0.9] mb-4 tracking-tighter drop-shadow-2xl">
               {tripData.title}
             </h1>
+            <div className="mb-6">
+              <ShareButton
+                tripTitle={tripData.title}
+                slug={trip.slug}
+              />
+            </div>
             <div className="flex flex-wrap items-center gap-6 text-stone-300 text-xl font-light">
               <div className="flex items-center gap-2">
                 <MapPin size={22} className="text-[#e6c419]" />
@@ -454,6 +463,14 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
           ))}
         </div>
       </section>
+
+      {/* BUDGET BREAKDOWN */}
+      {tripData.budget_breakdown && tripData.budget_breakdown.length > 0 && (
+        <BudgetBreakdown
+          breakdown={tripData.budget_breakdown}
+          total={tripData.estimated_budget}
+        />
+      )}
 
       {/* SECTION 4 — PACKING TIPS */}
       <section className="bg-[#0D2623] py-32 border-y border-white/10">
