@@ -34,6 +34,8 @@ from routes.auth import auth_bp
 from routes.trips import trips_bp
 from routes.reviews import reviews_bp
 from routes.edit import edit_bp
+from routes.booking import booking_bp
+
 
 # Setup basic logging
 logging.basicConfig(
@@ -80,6 +82,8 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(trips_bp)
 app.register_blueprint(reviews_bp)
 app.register_blueprint(edit_bp)
+app.register_blueprint(booking_bp)
+
 
 # Compile the LangGraph workflow once globally
 try:

@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  MapPin, Clock, Star, Edit3, Send, 
+import { MapPin, Clock, Star, Edit3, Send, 
   CheckCircle2, Info, Sparkles, 
   Calendar, IndianRupee,
-  Bed, Utensils, ArrowRight
+  Bed, Utensils, ArrowRight,
+  Plane
 } from "lucide-react";
 import type { TripState } from "@/types/trip";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -101,7 +101,7 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
      return Array.from(new Set(kw)).slice(0, 3);
   }, [trip]);
   
-  const { images: heroImages } = useMultipleUnsplashImages(heroKeywords, 3);
+  const { images: heroImages } = useMultipleUnsplashImages(heroKeywords);
   const finalHeroImages = useMemo(() => {
      const combined = [...heroImages];
      if (combined.length === 0 && trip.heroImage) combined.push(trip.heroImage);
@@ -612,14 +612,24 @@ const TripDetail = ({ trip }: { trip: TripState }) => {
 
            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             {user?.id === trip.user_id && (
-              <Button
-                variant="outline"
-                onClick={handleEdit}
-                className="border-[#e6c419] text-[#e6c419] hover:bg-[#e6c419] hover:text-[#0A1F1C] font-bold uppercase tracking-widest px-12 h-16 rounded-full transition-all"
-              >
-                <Edit3 className="mr-3" size={18} />
-                Refine Strategy
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate(`/booking/${trip.slug}`)}
+                  className="border-[#e6c419] text-[#e6c419] hover:bg-[#e6c419] hover:text-[#0A1F1C] font-bold uppercase tracking-widest px-10 h-16 rounded-full transition-all"
+                >
+                  <Plane className="mr-3" size={18} />
+                  Find Flights & Hotels
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleEdit}
+                  className="border-[#e6c419] text-[#e6c419] hover:bg-[#e6c419] hover:text-[#0A1F1C] font-bold uppercase tracking-widest px-10 h-16 rounded-full transition-all"
+                >
+                  <Edit3 className="mr-3" size={18} />
+                  Refine Strategy
+                </Button>
+              </>
             )}
             {user?.id !== trip.user_id && (
               <Button
