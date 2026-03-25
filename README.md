@@ -42,7 +42,7 @@ Scroll-driven homepage animation telling a visual story of transformation from c
 - **👤 Author:** KingMakerDEV
 - **📦 Version:** 1.0.0
 - **📄 License:** MIT
-- **🌐 Website:** [https://traveller-hero.vercel.app](https://traveller-hero.vercel.app)
+- **🌐 Website:** [](under ongoing work)
 - **📂 Repository:** [https://github.com/KingMakerDEV/Traveller-Hero](https://github.com/KingMakerDEV/Traveller-Hero)
 - **🏷️ Keywords:** AI travel planner, multi-agent AI, LangGraph, conversational AI, trip planning, psychological intent, React, Flask, Python, Nvidia NIM, Llama 3.3, Tavily search, Supabase, PostgreSQL, Google OAuth, Vercel, Render, Framer Motion, TypeScript, Vite, Tailwind CSS, Zustand, Unsplash API, Brevo email, real-time web search, natural language editing, itinerary generator, travel recommendation, full-stack web app, REST API, JWT authentication, dark theme UI, responsive design, shadcn/ui, LangChain, agentic AI, trip booking, user reviews, Indian travel, INR pricing
 
